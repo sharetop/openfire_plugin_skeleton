@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+    <!-- Main plugin class -->
+    <class>cn.sharetop.openfireplugin.skeleton.HelloPlugin</class>
+
+    <!-- Plugin meta-data -->
+    <name>Hello Plugin</name>
+    <description>This is an example plugin.</description>
+    <author>SHARETOP.CN</author>
+
+    <version>1.0</version>
+    <date>2013.08.15</date>
+    <url>http://www.sharetop.cn/openfire/hello/</url>
+    <minServerVersion>1.0.0</minServerVersion>
+    <licenseType>GPL</licenseType>
+
+    <!-- Admin console entries -->
+    <adminconsole>
+        <!-- More on this below -->
+        <!--
+        <tab id="mytab" name="HelloTab" url="hello.jsp" description="Click to show...">
+            <sidebar id="mysidebar" name="My Plugin">
+               <item id="my-plugin" name="My Plugin Admin"
+                   url="my-plugin-admin.jsp"
+                   description="Click to administer settings for my plugin" />
+            </sidebar>
+        </tab>
+        -->
+        <tab id="tab-server">
+            <sidebar id="sidebar-server-settings">
+                <item id="hello-service" name="Hello Service" url="hello.jsp"
+                     description="Click to show..." />
+            </sidebar>
+         </tab>
+    </adminconsole>
+</plugin>

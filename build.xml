@@ -1,0 +1,96 @@
+<project name="${project.name}" default="deploy" basedir=".">
+    <description>
+        
+    </description>
+    
+  <!-- set global properties for this build -->
+  <property file="build.properties" />
+  
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+  <property name="output" location="output"/>
+  <property name="work" location="work"/>
+
+  <!-- define openfire classpath -->
+  <path id="openfire.classpath">
+	<fileset dir="${openfire.home}/lib">
+     	<include name="*.jar" />
+	</fileset>
+  </path>
+  
+  <taskdef classname="org.apache.jasper.JspC" name="openfire_jasper">
+            <classpath>
+                <path refid="openfire.classpath"/>
+            </classpath>
+  </taskdef>
+        
+  <target name="init" depends="clean">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+    <mkdir dir="${build}/classes"/>
+    <mkdir dir="${build}/jsp-classes"/>
+  </target>
+
+  <target name="jspc" depends="init">
+      <openfire_jasper javaEncoding="utf-8" validateXml="false"
+            uriroot="${src}/web"
+            outputDir="${work}"
+            package="${package.name}"/>
+      <openfire_jasper validateXml="false"
+            uriroot="${src}/web"
+            outputDir="${work}"
+            package="${package.name}" 
+      		webXml="${src}/web/WEB-INF/web.xml"/>
+  </target>
+  <target name="compile" depends="jspc"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}/java" destdir="${build}/classes" includeAntRuntime="no">
+        <classpath>
+            <path refid="openfire.classpath" /> 
+        </classpath>
+    </javac>
+    <javac srcdir="${work}" destdir="${build}/jsp-classes" optimize="off" encoding="utf-8" debug="on" failonerror="true" includeAntRuntime="no">
+        <classpath>
+			<pathelement location="${build}/jsp-classes" />
+            <path refid="openfire.classpath" />
+        </classpath>
+    </javac>
+    
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}/lib"/>
+
+    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+    <jar jarfile="${dist}/lib/${plugin.name}.jar" basedir="${build}/classes"/>
+    <jar jarfile="${dist}/lib/${plugin.name}-jspc.jar" basedir="${build}/jsp-classes"/>
+    
+    <copy todir="${dist}/web">
+    	<fileset dir="${src}/web" excludes="**/*.jsp"/>
+  	</copy>
+  	<copy file="${src}/plugin.xml" tofile="${dist}/plugin.xml"/>
+    
+  </target>
+  
+  <target name="deploy" depends="dist"
+      description="generate a deploy jar file.">
+      
+    <jar jarfile="${output}/${plugin.name}.jar" basedir="${dist}"/>
+      
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+    <delete dir="${work}"/>
+    <delete file="${output}/${plugin.name}.jar"/>
+  </target>
+</project>
